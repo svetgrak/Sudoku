@@ -1,12 +1,12 @@
-simple = '0 6 8 0 0 0 9 3 0 \
-0 4 2 0 0 0 6 0 0 \
-1 9 0 0 8 0 0 4 0 \
-0 8 5 2 0 1 0 0 7 \
-7 0 0 8 9 0 0 0 0 \
-2 0 9 0 0 7 5 0 3 \
-0 2 0 1 0 0 0 5 0 \
-8 5 0 0 4 0 7 6 0 \
-4 7 3 0 5 2 0 0 9'
+simple = '0 0 0 0 0 0 6 0 9 ' \
+         '1 0 0 0 0 4 0 0 0 ' \
+         '0 0 5 3 0 6 8 2 1 ' \
+         '0 0 4 6 7 0 0 5 0 ' \
+         '0 0 7 0 0 0 9 0 0 ' \
+         '0 0 0 5 4 0 0 0 0 ' \
+         '3 7 0 4 0 5 2 0 6 ' \
+         '0 0 0 0 0 0 5 1 0 ' \
+         '0 6 0 0 2 0 0 3 7'
 
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -62,6 +62,7 @@ def get_line_from_blocks(sudoku):
 
 def check_last_hero(sudoku):
     for num_row, row in enumerate(sudoku):
+
         for i, numb in enumerate(row):
             if numb == 0:
                 possib_numbs = [n for n in numbers if n not in row]
@@ -69,7 +70,8 @@ def check_last_hero(sudoku):
             if type(numb) == list:
                 possib_numbs = [n for n in numb if n not in row]
                 row[i] = possib_numbs
-            sudoku[num_row] = row
+        row = check_last_in_cells(row)
+        sudoku[num_row] = row
 
     return sudoku
 
@@ -95,14 +97,31 @@ def check_solve(sudoku):
     return(True)
 
 
+def check_last_in_cells(row):
+    in_cells = {}
+    for cell in row:
+        if type(cell) == list:
+            for numb in cell:
+                in_cells.update({numb: in_cells.get(numb, 0) + 1})
+
+    for key in in_cells.keys():
+        if in_cells[key] == 1:
+            for position_cell, cell in enumerate(row):
+                if type(cell) == list and key in cell:
+                    row[position_cell] = key
+                    break
+    return row
+
 if __name__ == '__main__':
 
     solv_sudoku = simple.split(' ')
     solv_sudoku = [int(num) for num in solv_sudoku]
     for row in get_rows(solv_sudoku):
         print(row)
+    print()
 
     count_iterations = 0
+    #while count_iterations!=10:
     while check_solve(solv_sudoku) != True:
         solv_sudoku = get_line_from_rows(check_last_hero(get_rows(solv_sudoku)))
         solv_sudoku = get_line_from_columns(check_last_hero(get_columns(solv_sudoku)))
@@ -112,10 +131,17 @@ if __name__ == '__main__':
             if type(numb) == list and len(numb) == 1:
                 solv_sudoku[i] = numb[0]
 
-        count_iterations += 1
 
-    print()
-    print(count_iterations)
-    print()
-    for row in get_rows(solv_sudoku):
-        print(row)
+        print()
+        for row in get_rows(solv_sudoku):
+            print(row)
+
+
+        count_iterations += 1
+        print(count_iterations)
+
+
+
+
+
+
